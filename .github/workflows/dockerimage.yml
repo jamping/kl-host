@@ -18,7 +18,7 @@ jobs:
         DOCKER_REGISTRY_URL: docker.io
     - name: Build the Docker image
       if: success()
-      run: docker build . --file Dockerfile --tag kl-host:latest
+      run: docker build . --file Dockerfile --tag ${{ github.repository }}:latest
     - name: Push to docker hub :latest
       if: success()
       uses: actions-hub/docker@master
