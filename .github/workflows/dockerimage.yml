@@ -3,16 +3,23 @@ name: Docker Image CI
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
+    - name: Login to github registry
+      uses: actions-hub/docker/login@master
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        DOCKER_REGISTRY_URL: docker.pkg.github.com
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag kl-host:$(date +%s)
+      if: success()
+      run: docker build . --file Dockerfile --tag kl-host:latest
+    - name: Push to docker hub :latest
+      if: success()
+      uses: actions-hub/docker@master
+      with:
+        args: push docker.pkg.github.com/${{ github.repository }}:latest
